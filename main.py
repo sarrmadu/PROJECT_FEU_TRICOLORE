@@ -1,28 +1,30 @@
+import turtle
+import random
 from core.traffic_light import TrafficLight
 from core.scenario import NormalTraffic
 from core.simulation import Simulation
 from graphics.scene import Scene
 from graphics.traffic_light_view import TrafficLightView
 from entities.vehicle import Vehicle
-import turtle
 
-# --- CLASSE BOUTON ---
+# --- BOUTON MODERNE ---
 class Button:
-    def __init__(self, x, y, w, h, label, action):
+    def __init__(self, x, y, w, h, label, action, color="#00b4d8"):
         self.x = x
         self.y = y
         self.w = w
         self.h = h
+        self.label = label
+        self.color = color
         self.action = action
-
         self.t = turtle.Turtle()
         self.t.hideturtle()
         self.t.penup()
-        self.draw(label)
+        self.draw()
 
-    def draw(self, label):
+    def draw(self):
         self.t.goto(self.x, self.y)
-        self.t.color("black", "lightgray")
+        self.t.color("black", self.color)
         self.t.begin_fill()
         for _ in range(2):
             self.t.forward(self.w)
@@ -30,16 +32,17 @@ class Button:
             self.t.forward(self.h)
             self.t.right(90)
         self.t.end_fill()
-        self.t.goto(self.x + self.w/2, self.y - self.h + 8)
-        self.t.write(label, align="center", font=("Arial", 10, "bold"))
+        self.t.goto(self.x + self.w/2, self.y - self.h + 10)
+        self.t.color("white")
+        self.t.write(self.label, align="center", font=("Arial", 12, "bold"))
 
     def is_clicked(self, x, y):
-        return (self.x <= x <= self.x + self.w) and (self.y - self.h <= y <= self.y)
+        return self.x <= x <= self.x + self.w and self.y - self.h <= y <= self.y
 
     def click(self):
         self.action()
 
-# --- CONTROLES AVEC BOUTONS ---
+# --- CONTROLS ---
 class Controls:
     def __init__(self, simulation, scene):
         self.simulation = simulation
@@ -49,27 +52,61 @@ class Controls:
         self.scene.screen.onclick(self.handle_click)
 
     def create_buttons(self):
-        self.buttons.append(Button(-360, 180, 70, 30, "PLAY", self.simulation.start))
-        self.buttons.append(Button(-280, 180, 70, 30, "PAUSE", self.simulation.pause))
-        self.buttons.append(Button(-200, 180, 70, 30, "STOP", self.simulation.stop))
-        self.buttons.append(Button(-120, 180, 70, 30, "RESET", self.simulation.reset))
+        self.buttons.append(Button(-360, 180, 80, 35, "PLAY", self.simulation.start, "#06d6a0"))
+        self.buttons.append(Button(-270, 180, 80, 35, "PAUSE", self.simulation.pause, "#ffd166"))
+        self.buttons.append(Button(-180, 180, 80, 35, "STOP", self.simulation.stop, "#ef476f"))
+        self.buttons.append(Button(-90, 180, 80, 35, "RESET", self.simulation.reset, "#118ab2"))
 
     def handle_click(self, x, y):
         for btn in self.buttons:
             if btn.is_clicked(x, y):
                 btn.click()
 
+# --- VEHICULES AVEC COULEURS ALEATOIRES ---
+class ColoredVehicle(Vehicle):
+    COLORS = ["blue", "red", "green", "orange", "purple"]
+
+    def __init__(self):
+        super().__init__()
+        self.color(random.choice(self.COLORS))
+
+# --- SCENE AMELIOREE ---
+class StylishScene(Scene):
+    def __init__(self):
+        super().__init__()
+        self.drawer.color("#555555")  # fond route gris
+        self.draw_crossroad()
+        self.draw_markings()
+
+    def draw_markings(self):
+        self.drawer.color("white")
+        self.drawer.width(3)
+        # horizontales
+        for x in range(-380, 380, 40):
+            self.drawer.penup()
+            self.drawer.goto(x, 0)
+            self.drawer.pendown()
+            self.drawer.forward(20)
+        # verticales
+        for y in range(-180, 180, 40):
+            self.drawer.penup()
+            self.drawer.goto(0, y)
+            self.drawer.setheading(90)
+            self.drawer.pendown()
+            self.drawer.forward(20)
+        self.drawer.penup()
 
 # --- MAIN ---
 def main():
-    scene = Scene()
+    scene = StylishScene()
     traffic_light = TrafficLight()
     scenario = NormalTraffic()
     simulation = Simulation(traffic_light, scenario)
 
     # Ajouter des véhicules
-    for _ in range(3):
-        vehicle = Vehicle()
+    for i in range(4):
+        vehicle = ColoredVehicle()
+        vehicle.goto(-300 - i*60, -20)
         simulation.vehicles.append(vehicle)
 
     light_view = TrafficLightView()
@@ -86,7 +123,6 @@ def main():
 
     update()
     turtle.done()
-
 
 if __name__ == "__main__":
     main()
