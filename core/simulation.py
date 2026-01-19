@@ -1,3 +1,4 @@
+# --- Simulation.py ---
 class Simulation:
     def __init__(self, traffic_light, scenario):
         self.traffic_light = traffic_light
@@ -15,20 +16,20 @@ class Simulation:
 
     def stop(self):
         self.running = False
-        self.vehicles.clear()
+        # ne pas vider les véhicules pour pouvoir relancer
 
     def reset(self):
-        self.stop()
-        self.traffic_light.change_state(self.traffic_light.state)
+        self.traffic_light.change_state(self.traffic_light.state.RED)
+        for v in self.vehicles:
+            v.goto(-300, -20)
+            v.go()
+        self.running = False
+        self.paused = False
 
     def update(self):
         if not self.running or self.paused:
             return
-
         self.traffic_light.update(self.scenario.light_durations)
-
         for vehicle in self.vehicles:
-            self.scenario.apply_vehicle_behavior(
-                vehicle, self.traffic_light.state
-            )
+            self.scenario.apply_vehicle_behavior(vehicle, self.traffic_light.state)
             vehicle.move()

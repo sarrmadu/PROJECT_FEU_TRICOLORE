@@ -2,19 +2,18 @@ import turtle
 
 
 class Vehicle(turtle.Turtle):
-    def __init__(self, x=-300, y=-20):
+    def __init__(self):
         super().__init__()
         self.shape("square")
         self.color("blue")
         self.penup()
-        self.goto(x, y)
+        self.goto(-300, -20)
         self.speed_value = 2
 
     def move(self):
         self.forward(self.speed_value)
-
         if self.xcor() > 350:
-            self.goto(-350, self.ycor())
+            self.goto(-350, -20)
 
     def stop(self):
         self.speed_value = 0

@@ -1,8 +1,11 @@
 import sqlite3
+import os
 
 class Database:
-    def __init__(self):
-        self.conn = sqlite3.connect("logs/simulation.db")
+    def __init__(self, db_path="logs/simulation.db"):
+        # Crée le dossier logs si inexistant
+        os.makedirs(os.path.dirname(db_path), exist_ok=True)
+        self.conn = sqlite3.connect(db_path)
         self.cursor = self.conn.cursor()
         self.create_table()
 
