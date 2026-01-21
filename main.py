@@ -131,29 +131,21 @@ def main():
     # Ajouter des véhicules
     # --- Ajouter des véhicules sur toutes les voies ---
 
-    # EST → OUEST
-    for i in range(3):
-        v = ColoredVehicle(direction="EAST")
-        v.goto(-350 - i*80, -20)
-        simulation.vehicles.append(v)
+    directions = ["EAST", "WEST", "NORTH", "SOUTH"]
 
-    # OUEST → EST
-    for i in range(3):
-        v = ColoredVehicle(direction="WEST")
-        v.goto(350 + i*80, 20)
-        simulation.vehicles.append(v)
+    for direction in directions:
+        for i in range(3):  # 3 voitures par voie
+            v = Vehicle(direction)
+            if direction == "EAST":
+                v.goto(-350 - i*40, -20)
+            elif direction == "WEST":
+                v.goto(350 + i*40, 20)
+            elif direction == "NORTH":
+                v.goto(20, -350 - i*40)
+            elif direction == "SOUTH":
+                v.goto(-20, 350 + i*40)
 
-    # SUD → NORD
-    for i in range(3):
-        v = ColoredVehicle(direction="NORTH")
-        v.goto(20, -350 - i*80)
-        simulation.vehicles.append(v)
-
-    # NORD → SUD
-    for i in range(3):
-        v = ColoredVehicle(direction="SOUTH")
-        v.goto(-20, 350 + i*80)
-        simulation.vehicles.append(v)
+            simulation.vehicles.append(v)
 
 
     controls = Controls(simulation, scene)
