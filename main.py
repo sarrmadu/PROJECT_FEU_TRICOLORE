@@ -90,9 +90,10 @@ class Controls:
 class ColoredVehicle(Vehicle):
     COLORS = ["blue", "red", "green", "orange", "purple"]
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, direction="EAST"):
+        super().__init__(direction)
         self.color(random.choice(self.COLORS))
+
 
 # --- SCENE AMELIOREE ---
 class StylishScene(Scene):
@@ -128,10 +129,32 @@ def main():
     simulation = Simulation(traffic_light, scenario)
 
     # Ajouter des véhicules
-    for i in range(4):
-        vehicle = ColoredVehicle()
-        vehicle.goto(-300 - i*60, -20)
-        simulation.vehicles.append(vehicle)
+    # --- Ajouter des véhicules sur toutes les voies ---
+
+    # EST → OUEST
+    for i in range(3):
+        v = ColoredVehicle(direction="EAST")
+        v.goto(-350 - i*80, -20)
+        simulation.vehicles.append(v)
+
+    # OUEST → EST
+    for i in range(3):
+        v = ColoredVehicle(direction="WEST")
+        v.goto(350 + i*80, 20)
+        simulation.vehicles.append(v)
+
+    # SUD → NORD
+    for i in range(3):
+        v = ColoredVehicle(direction="NORTH")
+        v.goto(20, -350 - i*80)
+        simulation.vehicles.append(v)
+
+    # NORD → SUD
+    for i in range(3):
+        v = ColoredVehicle(direction="SOUTH")
+        v.goto(-20, 350 + i*80)
+        simulation.vehicles.append(v)
+
 
     controls = Controls(simulation, scene)
 

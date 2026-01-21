@@ -20,12 +20,30 @@ class NormalTraffic(Scenario):
         }
 
     def apply_vehicle_behavior(self, vehicle, light_state):
-        if light_state == LightState.RED and vehicle.xcor() < -40:
+
+        # --- Position et seuil selon direction ---
+        if vehicle.direction == "EAST":
+            pos = vehicle.xcor()
+            approaching = pos < -40
+        elif vehicle.direction == "WEST":
+            pos = vehicle.xcor()
+            approaching = pos > 40
+        elif vehicle.direction == "NORTH":
+            pos = vehicle.ycor()
+            approaching = pos < -40
+        else:  # SOUTH
+            pos = vehicle.ycor()
+            approaching = pos > 40
+
+        # --- Comportement ---
+        if light_state == LightState.RED and approaching:
             vehicle.stop()
-        elif light_state == LightState.ORANGE and vehicle.xcor() < -40:
+        elif light_state == LightState.ORANGE and approaching:
             vehicle.slow_down()
         else:
             vehicle.go()
+
+
 
 
 class RushHourTraffic(Scenario):
@@ -38,12 +56,27 @@ class RushHourTraffic(Scenario):
         }
 
     def apply_vehicle_behavior(self, vehicle, light_state):
-        if light_state == LightState.RED and vehicle.xcor() < -30:
+
+        if vehicle.direction == "EAST":
+            pos = vehicle.xcor()
+            approaching = pos < -30
+        elif vehicle.direction == "WEST":
+            pos = vehicle.xcor()
+            approaching = pos > 30
+        elif vehicle.direction == "NORTH":
+            pos = vehicle.ycor()
+            approaching = pos < -30
+        else:  # SOUTH
+            pos = vehicle.ycor()
+            approaching = pos > 30
+
+        if light_state == LightState.RED and approaching:
             vehicle.stop()
-        elif light_state == LightState.ORANGE and vehicle.xcor() < -30:
+        elif light_state == LightState.ORANGE and approaching:
             vehicle.slow_down()
         else:
             vehicle.go()
+
 
 
 class NightTraffic(Scenario):

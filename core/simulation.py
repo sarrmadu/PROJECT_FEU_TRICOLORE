@@ -36,6 +36,13 @@ class Simulation:
             return
         self.traffic_light.update(self.scenario.light_durations)
         for vehicle in self.vehicles:
-            self.scenario.apply_vehicle_behavior(vehicle, self.traffic_light.ew_state)
+            # Choisir le bon feu selon la direction
+            if vehicle.direction in ("EAST", "WEST"):
+                light_state = self.traffic_light.ew_state
+            else:  # NORTH / SOUTH
+                light_state = self.traffic_light.ns_state
+
+            self.scenario.apply_vehicle_behavior(vehicle, light_state)
             vehicle.move()
+
     
