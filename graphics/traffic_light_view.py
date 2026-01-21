@@ -2,54 +2,43 @@ import turtle
 from core.traffic_light import LightState
 
 class TrafficLightView:
-    def __init__(self, x=80, y=40):
-        self.turtle = turtle.Turtle()
-        self.turtle.hideturtle()
-        self.turtle.speed(0)
-        self.turtle.penup()
-
+    def __init__(self, x=40, y=40):
         self.x = x
         self.y = y
-
-        self.radius = 12
-        self.off_color = "black"
-
-    def draw_support(self):
-        self.turtle.goto(self.x - 20, self.y + 50)
-        self.turtle.color("black", "darkgray")
-        self.turtle.begin_fill()
-        for _ in range(2):
-            self.turtle.forward(40)
-            self.turtle.right(90)
-            self.turtle.forward(140)
-            self.turtle.right(90)
-        self.turtle.end_fill()
-
-    def draw_light(self, y_offset, color):
-        self.turtle.goto(self.x, self.y - y_offset)
-        self.turtle.color("black", color)
-        self.turtle.begin_fill()
-        self.turtle.circle(self.radius)
-        self.turtle.end_fill()
+        self.t = turtle.Turtle()
+        self.t.hideturtle()
+        self.t.penup()
+        self.t.speed(0)
+        self.t.width(2)
 
     def draw(self, state: LightState):
-        self.turtle.clear()
-        self.draw_support()
+        self.t.clear()
 
-        # Par défaut : lumières éteintes
-        red = self.off_color
-        orange = self.off_color
-        green = self.off_color
+        # ─── BOITIER ───
+        self.t.goto(self.x - 18, self.y + 50)
+        self.t.setheading(0)
+        self.t.color("black", "#444444")
+        self.t.begin_fill()
+        for _ in range(2):
+            self.t.forward(36)
+            self.t.right(90)
+            self.t.forward(100)
+            self.t.right(90)
+        self.t.end_fill()
 
-        if state == LightState.RED:
-            red = "red"
-        elif state == LightState.ORANGE:
-            orange = "orange"
-        elif state == LightState.GREEN:
-            green = "green"
-        elif state == LightState.BLINK_ORANGE:
-            orange = "orange"
+        # ─── FEUX ───
+        self._draw_light(self.y + 30, state == LightState.RED, "red")
+        self._draw_light(self.y,      state == LightState.ORANGE, "orange")
+        self._draw_light(self.y - 30,  state == LightState.GREEN, "green")
 
-        self.draw_light(20, red)
-        self.draw_light(50, orange)
-        self.draw_light(80, green)
+    def _draw_light(self, y, active, color):
+        self.t.goto(self.x, y)
+        self.t.setheading(0)
+        self.t.penup()
+
+        if active:
+            self.t.color(color)
+        else:
+            self.t.color("#111111")
+
+        self.t.dot(20)

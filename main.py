@@ -1,7 +1,7 @@
 import turtle
 import random
 from core.traffic_light import TrafficLight
-from core.scenario import NormalTraffic
+from core.scenario import NormalTraffic, RushHourTraffic, NightTraffic
 from core.simulation import Simulation
 from graphics.scene import Scene
 from graphics.traffic_light_view import TrafficLightView
@@ -52,17 +52,41 @@ class Controls:
         self.scene.screen.onclick(self.handle_click)
 
     def create_buttons(self):
-        self.buttons.append(Button(-360, 180, 80, 35, "PLAY", self.simulation.start, "#06d6a0"))
-        self.buttons.append(Button(-270, 180, 80, 35, "PAUSE", self.simulation.pause, "#ffd166"))
-        self.buttons.append(Button(-180, 180, 80, 35, "STOP", self.simulation.stop, "#ef476f"))
-        self.buttons.append(Button(-90, 180, 80, 35, "RESET", self.simulation.reset, "#118ab2"))
+        UI_Y = 260  # position verticale des boutons (hors route)
+
+        # --- Contrôle simulation ---
+        self.buttons.append(Button(-360, UI_Y, 80, 35, "PLAY",
+                                self.simulation.start, "#06d6a0"))  # vert
+        self.buttons.append(Button(-270, UI_Y, 80, 35, "PAUSE",
+                                self.simulation.pause, "#ffd166"))  # jaune
+        self.buttons.append(Button(-180, UI_Y, 80, 35, "STOP",
+                                self.simulation.stop, "#ef476f"))   # rouge
+        self.buttons.append(Button(-90,  UI_Y, 80, 35, "RESET",
+                                self.simulation.reset, "#118ab2"))  # bleu
+
+        # --- Scénarios ---
+        self.buttons.append(Button(30,  UI_Y, 100, 35, "Normal",
+                                self.set_normal, "#2ec4b6"))        # vert clair
+        self.buttons.append(Button(150, UI_Y, 100, 35, "Rush Hour",
+                                self.set_rush, "#f77f00"))          # orange
+        self.buttons.append(Button(270, UI_Y, 100, 35, "Night",
+                                self.set_night, "#495057"))         # gris foncé
 
     def handle_click(self, x, y):
         for btn in self.buttons:
             if btn.is_clicked(x, y):
                 btn.click()
 
-# --- VEHICULES AVEC COULEURS ALEATOIRES ---
+    def set_normal(self):
+        self.simulation.scenario = NormalTraffic()
+
+    def set_rush(self):
+        self.simulation.scenario = RushHourTraffic()
+
+    def set_night(self):
+        self.simulation.scenario = NightTraffic()
+
+# --- VEHICULES COLORES ---
 class ColoredVehicle(Vehicle):
     COLORS = ["blue", "red", "green", "orange", "purple"]
 
@@ -109,15 +133,33 @@ def main():
         vehicle.goto(-300 - i*60, -20)
         simulation.vehicles.append(vehicle)
 
-    light_view = TrafficLightView()
     controls = Controls(simulation, scene)
 
     simulation.start()
+    # --- Feux tricolores sur chaque voie ---
+    light_north = TrafficLightView(0, 100)
+    light_south = TrafficLightView(0, -100)
+    light_east  = TrafficLightView(100, 0)
+    light_west  = TrafficLightView(-100, 0)
+
+    light_views = [
+        light_north,
+        light_south,
+        light_east,
+        light_west
+    ]
+
 
     # Boucle principale
     def update():
         simulation.update()
-        light_view.draw(traffic_light.state)
+        light_north.draw(traffic_light.ns_state)
+        light_south.draw(traffic_light.ns_state)
+
+        light_east.draw(traffic_light.ew_state)
+        light_west.draw(traffic_light.ew_state)
+
+        
         scene.refresh()
         scene.screen.ontimer(update, 50)
 

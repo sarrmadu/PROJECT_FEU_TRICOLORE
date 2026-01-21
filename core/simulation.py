@@ -26,10 +26,16 @@ class Simulation:
         self.running = False
         self.paused = False
 
+    def change_scenario(self, new_scenario):
+        self.scenario = new_scenario
+        self.traffic_light.last_change = 0  # pour que les nouvelles durées prennent effet immédiatement
+
+
     def update(self):
         if not self.running or self.paused:
             return
         self.traffic_light.update(self.scenario.light_durations)
         for vehicle in self.vehicles:
-            self.scenario.apply_vehicle_behavior(vehicle, self.traffic_light.state)
+            self.scenario.apply_vehicle_behavior(vehicle, self.traffic_light.ew_state)
             vehicle.move()
+    
